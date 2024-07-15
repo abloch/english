@@ -10,29 +10,43 @@
   </head>
   <body>
     <div x-data = '{
+      debug: false,
       isLoading: true,
       vocab: null,
-      debug: true,
       toDisplay: [],
+      question: {},
       init: async function() {
         let resp = await axios.get("/vocab1.json");
         this.vocab = resp.data;
         this.isLoading = false;
-        this.toDisplay = this.getCurrent4();
+        this.toDisplay = this.randomNum(this.vocab, 4);
+        this.question = this.randomNum(this.toDisplay, 1)[0];
       },
-      getCurrent4: function() {
-        if (!this.vocab) return [];
-        const shuffled = this.vocab.sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 4);
+      randomNum: function(arr, num) {
+        if (!arr) {
+          return [];
+        }
+        const shuffled = arr.sort(() => 0.5 - Math.random());
+        let ret = shuffled.slice(0, num);
+        return ret;
+      },
+      checkAnswer: function(card) {
+        const correct = card.hebrew === this.question.hebrew;
+        console.log(correct);
       }
     }'>
-      <div x-show="isLoading">loading...</div>
-      <div x-show="toDisplay">
-          <button @click="toDisplay = getCurrent4()">Shuffle</button>
+
+      <div x-show="isLoading">טוען...</div>
+      <div x-show="isLoading==false">
+      <div class="notification is-primary title has-text-centered" x-text='question.english'></div>
+      <div class="fixed-grid has-2-cols">
+        <div class="grid">          
+          <template x-for="card in toDisplay">
+              <div class="cell button" x-text="card.hebrew" @click="checkAnswer(card)"></div>
+            </template>
+        </div>
       </div>
-      <div x-show="debug">
-        <pre x-text="JSON.stringify(toDisplay, null, 4)"/>
-      </div>
+
     </div>
   </body>
 </html>
