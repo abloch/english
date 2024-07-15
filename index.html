@@ -15,6 +15,7 @@
       vocab: null,
       toDisplay: [],
       question: {},
+      wasWrong: true,
       init: async function() {
         let resp = await axios.get("/vocab1.json");
         this.vocab = resp.data;
@@ -22,6 +23,7 @@
         this.reshuffle();
       },
       reshuffle: function() {
+        this.wasWrong = false;
         this.toDisplay = this.randomNum(this.vocab, 4);
         this.question = this.randomNum(this.toDisplay, 1)[0];
       },
@@ -38,7 +40,7 @@
         if (correct) {
           this.reshuffle();
         } else {
-          alert("Wrong!");
+          this.wasWrong = true;
         }
       }
     }'>
@@ -46,6 +48,7 @@
       <div x-show="isLoading">טוען...</div>
       <div x-show="isLoading==false">
       <div class="notification is-primary title has-text-centered" x-text='question.english'></div>
+      
       <div class="fixed-grid has-2-cols">
         <div class="grid">          
           <template x-for="card in toDisplay">
@@ -53,6 +56,8 @@
             </template>
         </div>
       </div>
+      <div class="notification is-warning has-text-centered" x-show="wasWrong">תשובה לא נכונה</div>
+
     </div>
   </body>
 </html>
