@@ -19,20 +19,27 @@
         let resp = await axios.get("/vocab1.json");
         this.vocab = resp.data;
         this.isLoading = false;
+        this.reshuffle();
+      },
+      reshuffle: function() {
         this.toDisplay = this.randomNum(this.vocab, 4);
         this.question = this.randomNum(this.toDisplay, 1)[0];
       },
       randomNum: function(arr, num) {
         if (!arr) {
           return [];
-        }
+        };
         const shuffled = arr.sort(() => 0.5 - Math.random());
         let ret = shuffled.slice(0, num);
         return ret;
       },
       checkAnswer: function(card) {
         const correct = card.hebrew === this.question.hebrew;
-        console.log(correct);
+        if (correct) {
+          this.reshuffle();
+        } else {
+          alert("Wrong!");
+        }
       }
     }'>
 
@@ -46,7 +53,6 @@
             </template>
         </div>
       </div>
-
     </div>
   </body>
 </html>
