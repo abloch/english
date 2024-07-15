@@ -35,7 +35,6 @@
         let resp = await axios.get("/vocab1.json");
         this.vocab = resp.data;
         this.ready = true;
-        this.reshuffle();
       },
       delay: function(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
