@@ -3,77 +3,112 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
+    <title>חידון אנגלית</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.2.5/pixi.min.js" integrity="sha512-El8usy3mGm7c8YFilFgpHPF5XHb1Byr8QAXh8FRqEhZftRkXegQJyCbBbpIsixX5wHRpY2khP7r0S6rYfFg4FA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style type="text/css" media="screen">
+      .footer {
+        position: absolute;
+        bottom: 0;
+        padding: 1rem;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
     <div id="app" x-data = '{
-      debug: false,
-      isLoading: true,
-      vocab: null,
+      ready: false,
+      started: false,
+      vocab: undefined,
+      bigger: false,
       toDisplay: [],
-      question: {},
+      question: undefined,
       points: $persist(0),
-      wasWrong: true,
+      level: $persist(1),
+      perPage: 4,
+      wasWrong: false,
       init: async function() {
         let resp = await axios.get("/vocab1.json");
         this.vocab = resp.data;
-        this.isLoading = false;
+        this.ready = true;
         this.reshuffle();
       },
+      delay: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      },
       reshuffle: function() {
+        this.question = undefined;
+        this.started = true;
         this.wasWrong = false;
-        this.toDisplay = this.randomNum(this.vocab, 4);
-        this.question = this.randomNum(this.toDisplay, 1)[0];
+        this.toDisplay = _.sampleSize(this.vocab, this.perPage);
+        this.question = _.sample(this.toDisplay);
+        this.tts(this.question.english);
       },
-      randomNum: function(arr, num) {
-        if (!arr) {
-          return [];
-        };
-        const shuffled = arr.sort(() => 0.5 - Math.random());
-        let ret = shuffled.slice(0, num);
-        return ret;
+      tts: function(text) {
+        let ut = new SpeechSynthesisUtterance(text);
+        ut.lang = "en-US";
+        speechSynthesis.speak(ut);
       },
-      checkAnswer: function(card) {
-        const correct = card.hebrew === this.question.hebrew;
-        if (correct) {
-          if (this.points === undefined) {
-            this.points = 0;
-          };
-          if (!this.wasWrong) {
-            this.points+=10;
-          } else {
-            this.points+=5;
-          }
+      checkAnswer: async function(card) {
+        const iscorrect = card.hebrew === this.question.hebrew;
+        if (iscorrect) {
           this.reshuffle();
+          this.pointsEffect();
+          if (!this.wasWrong) {
+            this.points += 10; // first attempt, 10 points
+          } else {
+            this.points += 5; // second+ attemp, 5 point
+          }
         } else {
+          if (!this.wasWrong) {
+            this.points -= 5; // first wrong, -5 points
+          } else {
+           this.points -= 15; // second wrong, -10 points
+          } 
           this.wasWrong = true;
+          this.showWrong = true;
+          await this.delay(2000);
+          this.showWrong = false;
         }
+      },
+      pointsEffect: async function() {
+        this.bigger = true;
+        await this.delay(400);
+        this.bigger = false;
       }
     }'>
-        <div x-show="isLoading">טוען...</div>
-        <div x-show="isLoading==false">
-        <div class="notification is-primary title has-text-centered" x-text='question.english'></div>
-        
-        <div class="fixed-grid has-2-cols">
-          <div class="grid">          
-            <template x-for="card in toDisplay">
-                <div class="cell button" x-text="card.hebrew" @click="checkAnswer(card)"></div>
-              </template>
-          </div>
-        </div>
+      <div class="columns is-flex-direction-column is-fullheight">
 
-        <div class="notification is-warning has-text-centered" x-show="wasWrong">תשובה לא נכונה</div>
+        <header class="column is-narrow">
+            <h1 class="title button has-text-centered box" x-show="ready && !started" @click="reshuffle()" x-text="level + ' להתחיל את שלב '"></h1>
+            <div class="notification is-link title has-text-centered is-size-2" x-show="question" x-text='question?.english'></div>
+        </header>
 
-        <div>
-          <footer class="footer" x-show="points">
-            <small>
-              <span x-text="points"></span> 👑
-            </small>
-          </footer>
-        </div>  
+        <div class="is-full column">  <!-- center div -->
+            <div class="fixed-grid has-2-cols"> <!-- grid -->
+                <div class="grid">
+                    <template x-for="card in toDisplay">
+                        <div class="cell column button is-white is-size-4 is-rounded" x-text="card.hebrew" @click="checkAnswer(card)">
+                        </div>
+                    </template>
+                </div>
+            </div> <!-- /grid -->
+        </div> <!-- /center div -->
+
+        <br/>
+        <div class="is-quarter"> </div>
+        <div class="notification column is-rounded is-full is-danger has-text-centered" x-transition:enter.duration.2600ms x-show="wasWrong && showWrong">תשובה לא נכונה</div>
+
+        <footer class="footer" x-show="started">
+            <div class="columns">
+              
+              <is-full div class="column" x-text='level + "  🪜"'></div>
+              <div class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
+            </div>
+        </footer>
   </body>
 </html>
