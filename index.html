@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <div x-data = '{
+      isLoading: true,
+      vocab: null,
+      debug: true,
+      toDisplay: [],
+      init: async function() {
+        let resp = await axios.get("/vocab1.json");
+        this.vocab = resp.data;
+        this.isLoading = false;
+        this.toDisplay = this.getCurrent4();
+      },
+      getCurrent4: function() {
+        if (!this.vocab) return [];
+        const shuffled = this.vocab.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 4);
+      }
+    }'>
+      <div x-show="isLoading">loading...</div>
+      <div x-show="toDisplay">
+          <button @click="toDisplay = getCurrent4()">Shuffle</button>
+      </div>
+      <div x-show="debug">
+        <pre x-text="JSON.stringify(toDisplay, null, 4)"/>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+[
+    
+        {"english": "appear",            "hebrew": "להופיע"},
+        {"english": "competition",       "hebrew": "תחרות"},
+        {"english": "discover",          "hebrew": "לגלות"},
+        {"english": "judge",             "hebrew": "שופט"},
+        {"english": "like",              "hebrew": "כמו"},
+        {"english": "public",            "hebrew": "ציבורי"},
+        {"english": "stage",             "hebrew": "שלב"},
+        {"english": "the same",          "hebrew": "אותו הדבר"},
+
+        {"english": "cash",              "hebrew": "כסף מזומן"},
+        {"english": "entertain",         "hebrew": "לבדר"},
+        {"english": "persoanl",          "hebrew": "אישי"},
+        {"english": "popular",           "hebrew": "פופולרי"},
+        {"english": "surprise",          "hebrew": "הפתעה"},
+        {"english": "try out",           "hebrew": "לנסות"},
+        {"english": "voice",             "hebrew": "קול"},
+        {"english": "(your) own",        "hebrew": "שלך"},
+
+        {"english": "audience",          "hebrew": "קהל"},
+        {"english": "collect",           "hebrew": "לאסוף"},
+        {"english": "perform",           "hebrew": "להופיע"},
+        {"english": "player",            "hebrew": "נגן מוזיקה/שחקן"},
+        {"english": "take part in",      "hebrew": "להשתתף ב"},
+        {"english": "well-known",        "hebrew": "מפורסם, מוכר"},
+        {"english": "wish",              "hebrew": "לאחל"}
+    
+]
