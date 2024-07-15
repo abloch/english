@@ -6,15 +6,17 @@
     <title>Hello Bulma!</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
   </head>
   <body>
-    <div x-data = '{
+    <div id="app" x-data = '{
       debug: false,
       isLoading: true,
       vocab: null,
       toDisplay: [],
       question: {},
+      points: $persist(0),
       wasWrong: true,
       init: async function() {
         let resp = await axios.get("/vocab1.json");
@@ -38,26 +40,40 @@
       checkAnswer: function(card) {
         const correct = card.hebrew === this.question.hebrew;
         if (correct) {
+          if (this.points === undefined) {
+            this.points = 0;
+          };
+          if (!this.wasWrong) {
+            this.points+=10;
+          } else {
+            this.points+=5;
+          }
           this.reshuffle();
         } else {
           this.wasWrong = true;
         }
       }
     }'>
-
-      <div x-show="isLoading">טוען...</div>
-      <div x-show="isLoading==false">
-      <div class="notification is-primary title has-text-centered" x-text='question.english'></div>
-      
-      <div class="fixed-grid has-2-cols">
-        <div class="grid">          
-          <template x-for="card in toDisplay">
-              <div class="cell button" x-text="card.hebrew" @click="checkAnswer(card)"></div>
-            </template>
+        <div x-show="isLoading">טוען...</div>
+        <div x-show="isLoading==false">
+        <div class="notification is-primary title has-text-centered" x-text='question.english'></div>
+        
+        <div class="fixed-grid has-2-cols">
+          <div class="grid">          
+            <template x-for="card in toDisplay">
+                <div class="cell button" x-text="card.hebrew" @click="checkAnswer(card)"></div>
+              </template>
+          </div>
         </div>
-      </div>
-      <div class="notification is-warning has-text-centered" x-show="wasWrong">תשובה לא נכונה</div>
 
-    </div>
+        <div class="notification is-warning has-text-centered" x-show="wasWrong">תשובה לא נכונה</div>
+
+        <div>
+          <footer class="footer" x-show="points">
+            <small>
+              נקודות <span x-text="points"></span> 
+            </small>
+          </footer>
+        </div>  
   </body>
 </html>
