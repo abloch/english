@@ -10,7 +10,6 @@
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.2.5/pixi.min.js" integrity="sha512-El8usy3mGm7c8YFilFgpHPF5XHb1Byr8QAXh8FRqEhZftRkXegQJyCbBbpIsixX5wHRpY2khP7r0S6rYfFg4FA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3GVTQRVYBT"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -32,12 +31,13 @@
     <div id="app" x-data = '{
       ready: false,
       started: false,
-      vocab: undefined,
+      vocab: null,
       bigger: false,
       toDisplay: [],
-      question: undefined,
+      question: null,
       points: $persist(0),
       level: $persist(1),
+      user: $persist(null),
       perPage: 4,
       wasWrong: false,
       init: async function() {
@@ -48,8 +48,21 @@
       delay: function(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
       },
+      login: function() {
+        this.user = {
+          name: "אורח",
+          id: 1
+        };
+        this.ready = true;
+        this.started = true;
+      },
+      logout: function() {
+        this.user = false;
+        this.ready = false;
+        this.started = false;
+      },
       reshuffle: function() {
-        this.question = undefined;
+        this.question = null;
         this.started = true;
         this.wasWrong = false;
         this.toDisplay = _.sampleSize(this.vocab, this.perPage);
@@ -90,13 +103,13 @@
       }
     }'>
       <div class="columns is-flex-direction-column is-fullheight">
-
-        <header class="column is-narrow">
-            <h1 class="title button has-text-centered box" x-show="ready && !started" @click="reshuffle()" x-text="level + ' להתחיל את שלב '"></h1>
+        <h1 class="title button has-text-centered box" x-show="!user" @click="login()">להזדהות</h1>          
+        <header x-show="ready" class="column is-narrow">
+            <h1 class="title button has-text-centered box" x-show="user && ready && !started" @click="reshuffle()" x-text="level + ' להתחיל את שלב '"></h1>
             <div class="notification is-link title has-text-centered is-size-2" x-show="question" x-text='question?.english'></div>
         </header>
 
-        <div class="is-full column">  <!-- center div -->
+        <div x-show="user && ready" class="is-full column">  <!-- center div -->
             <div class="fixed-grid has-2-cols"> <!-- grid -->
                 <div class="grid">
                     <template x-for="card in toDisplay">
@@ -111,12 +124,14 @@
         <div class="is-quarter"> </div>
         <div class="notification column is-rounded is-full is-danger has-text-centered" x-transition:enter.duration.2600ms x-show="wasWrong && showWrong">תשובה לא נכונה</div>
 
-        <footer class="footer" x-show="started">
-            <div class="columns">
-              
-              <is-full div class="column" x-text='level + "  🪜"'></div>
-              <div class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
-            </div>
-        </footer>
+        <template x-if="user">
+          <footer class="footer" >
+              <div class="columns">
+                <div x-show="user" class="column" x-text="'שם: ' + user.name" @click="logout"></div><br/>
+                <is-full x-show="started" div class="column" x-text='level + "  🪜"'></div>
+                <div x-show="started" class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
+              </div>
+          </footer>
+      </template>
   </body>
 </html>
