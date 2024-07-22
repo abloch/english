@@ -53,12 +53,10 @@
           name: "אורח",
           id: 1
         };
-        this.ready = true;
-        this.started = true;
+        this.reshuffle();
       },
       logout: function() {
         this.user = false;
-        this.ready = false;
         this.started = false;
       },
       reshuffle: function() {
@@ -106,7 +104,7 @@
         <h1 class="title button has-text-centered box" x-show="!user" @click="login()">להזדהות</h1>          
         <header x-show="ready" class="column is-narrow">
             <h1 class="title button has-text-centered box" x-show="user && ready && !started" @click="reshuffle()" x-text="level + ' להתחיל את שלב '"></h1>
-            <div class="notification is-link title has-text-centered is-size-2" x-show="question" x-text='question?.english'></div>
+            <div class="notification is-link title has-text-centered is-size-2" x-show="started && question" x-text='question?.english'></div>
         </header>
 
         <div x-show="user && ready" class="is-full column">  <!-- center div -->
@@ -122,12 +120,12 @@
 
         <br/>
         <div class="is-quarter"> </div>
-        <div class="notification column is-rounded is-full is-danger has-text-centered" x-transition:enter.duration.2600ms x-show="wasWrong && showWrong">תשובה לא נכונה</div>
+        <div class="notification column is-rounded is-full is-danger has-text-centered" x-transition:enter.duration.2600ms x-show="started && wasWrong && showWrong">תשובה לא נכונה</div>
 
         <template x-if="user">
           <footer class="footer" >
               <div class="columns">
-                <div x-show="user" class="column" x-text="'שם: ' + user.name" @click="logout"></div><br/>
+                <div x-show="user?.name" class="column" x-text="'שם: ' + user.name" @click="logout"></div>
                 <is-full x-show="started" div class="column" x-text='level + "  🪜"'></div>
                 <div x-show="started" class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
               </div>
