@@ -11,13 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.2.5/pixi.min.js" integrity="sha512-El8usy3mGm7c8YFilFgpHPF5XHb1Byr8QAXh8FRqEhZftRkXegQJyCbBbpIsixX5wHRpY2khP7r0S6rYfFg4FA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3GVTQRVYBT"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-3GVTQRVYBT');
-    </script>
+    <script type="module" src="./index.js"></script>
     <style type="text/css" media="screen">
       .footer {
         position: absolute;
@@ -29,6 +23,7 @@
   </head>
   <body>
     <div id="app" x-data = '{
+      debug: false,
       ready: false,
       started: false,
       vocab: null,
@@ -48,15 +43,19 @@
       delay: function(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
       },
-      login: function() {
-        this.user = {
-          name: "אורח",
-          id: 1
-        };
-        this.reshuffle();
+      login: async function() {  
+        fbuser = await window.fblogin();
+        console.log(fbuser);
+        this.user = fbuser;
+        //this.user = {
+        //  name: "אורח",
+        //  id: 1
+        //};
+        //this.reshuffle();
       },
       logout: function() {
-        this.user = false;
+        console.log(this.user);
+        this.user = null;
         this.started = false;
       },
       reshuffle: function() {
@@ -108,28 +107,31 @@
         </header>
 
         <div x-show="user && ready" class="is-full column">  <!-- center div -->
-            <div class="fixed-grid has-2-cols"> <!-- grid -->
-                <div class="grid">
-                    <template x-for="card in toDisplay">
-                        <div class="cell column button is-white is-size-4 is-rounded" x-text="card.hebrew" @click="checkAnswer(card)">
-                        </div>
-                    </template>
-                </div>
-            </div> <!-- /grid -->
+            <template x-if="toDisplay">
+              <div class="fixed-grid has-2-cols"> <!-- grid -->
+                  <div class="grid">
+                      <template x-for="card in toDisplay">
+                          <div class="cell column button is-white is-size-4 is-rounded" x-text="card.hebrew" @click="checkAnswer(card)">
+                          </div>
+                      </template>
+                  </div>
+              </div> <!-- /grid -->
+            </template>
         </div> <!-- /center div -->
 
         <br/>
         <div class="is-quarter"> </div>
         <div class="notification column is-rounded is-full is-danger has-text-centered" x-transition:enter.duration.2600ms x-show="started && wasWrong && showWrong">תשובה לא נכונה</div>
 
-        <template x-if="user">
+        <template x-if="ready">
           <footer class="footer" >
               <div class="columns">
-                <div x-show="user?.name" class="column" x-text="'שם: ' + user.name" @click="logout"></div>
                 <is-full x-show="started" div class="column" x-text='level + "  🪜"'></div>
-                <div x-show="started" class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
+                <div x-show="started" class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='user.displayName + ": " + points + " 👑"'></div>
               </div>
-          </footer>
+              <pre x-show="debug" x-text="JSON.stringify(user, null, 2)" @click="logout()"></pre>
+          </footer>          
       </template>
+      
   </body>
 </html>
