@@ -47,7 +47,7 @@
       perPage: 6,
       wasWrong: false,
       init: async function() {
-        let resp = await axios.get("/vocab" + this.level + ".json");
+        let resp = await axios.get("/vocab2.json");
         this.vocab = resp.data;
         this.ready = true;
 
