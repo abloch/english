@@ -50,6 +50,9 @@
         let resp = await axios.get("/vocab" + this.level + ".json");
         this.vocab = resp.data;
         this.ready = true;
+        if this.points > 200 {
+          this.level = 2;
+        }
       },
       delay: function(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
