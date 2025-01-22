@@ -50,7 +50,7 @@
         let resp = await axios.get("/vocab" + this.level + ".json");
         this.vocab = resp.data;
         this.ready = true;
-        if this.points > 200 {
+        if this.points && this.points > 200 {
           this.level = 2;
         }
       },
