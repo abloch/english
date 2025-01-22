@@ -129,7 +129,7 @@
 
           <is-full div class="column" x-text='level + "  🪜"'>
         </div>
-        <div class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
+        <div x-if='points' class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
     </div>
     </footer>
 </body>
