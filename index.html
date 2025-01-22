@@ -43,16 +43,14 @@
       toDisplay: [],
       question: undefined,
       points: $persist(0),
-      level: $persist(),
+      level: $persist(2),
       perPage: 2 * this.level + 2,
       wasWrong: false,
       init: async function() {
         let resp = await axios.get("/vocab" + this.level + ".json");
         this.vocab = resp.data;
         this.ready = true;
-        if this.points && this.points > 200 {
-          this.level = 2;
-        }
+
       },
       delay: function(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -129,7 +127,7 @@
 
           <is-full div class="column" x-text='level + "  🪜"'>
         </div>
-        <div x-if='points' class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
+        <div class="column" :class='bigger ? "is-size-4" : "is-size-6"' x-text='points + " 👑"'></div>
     </div>
     </footer>
 </body>
